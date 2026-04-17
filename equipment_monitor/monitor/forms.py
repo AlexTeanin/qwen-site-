@@ -1,5 +1,5 @@
 from django import forms
-from .models import Report, ProblemType
+from .models import Report, ProblemType, ChecklistTemplate, ChecklistItem, DailyChecklist, ChecklistResult
 
 class ReportForm(forms.ModelForm):
     class Meta:
@@ -26,3 +26,22 @@ class ReportForm(forms.ModelForm):
         self.fields['downtime_start'].label = "Время начала простоя"
         self.fields['description'].label = "Описание"
         self.fields['photo'].label = "Фотография проблемы"
+
+class ChecklistForm(forms.ModelForm):
+    class Meta:
+        model = DailyChecklist
+        fields = []
+
+class EmailSettingsForm(forms.ModelForm):
+    class Meta:
+        model = None  # Будет установлено динамически
+        fields = ['email_host', 'email_port', 'email_use_tls', 'email_host_user', 'email_host_password', 'admin_email', 'is_active']
+        widgets = {
+            'email_host': forms.TextInput(attrs={'class': 'form-control'}),
+            'email_port': forms.NumberInput(attrs={'class': 'form-control'}),
+            'email_use_tls': forms.CheckboxInput(),
+            'email_host_user': forms.EmailInput(attrs={'class': 'form-control'}),
+            'email_host_password': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'admin_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(),
+        }
