@@ -1,0 +1,83 @@
+{% extends "monitor/base.html" %}
+{% block title %}Все отчёты{% endblock %}
+{% block content %}
+
+<h4 class="mb-3"><i class="fas fa-list me-2"></i>Все отчёты</h4>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-3">
+                <select name="section" class="form-select">
+                    <option value="">Все участки</option>
+                    {% for s in sections %}
+                        <option value="{{ s.id }}" {% if request.GET.section == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    <option value="new" {% if request.GET.status == 'new' %}selected{% endif %}>Новая</option>
+                    <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>В работе</option>
+                    <option value="resolved" {% if request.GET.status == 'resolved' %}selected{% endif %}>Решена</option>
+                    <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Закрыта</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="severity" class="form-select">
+                    <option value="">Все критичности</option>
+                    <option value="low" {% if request.GET.severity == 'low' %}selected{% endif %}>Низкая</option>
+                    <option value="medium" {% if request.GET.severity == 'medium' %}selected{% endif %}>Средняя</option>
+                    <option value="high" {% if request.GET.severity == 'high' %}selected{% endif %}>Высокая</option>
+                    <option value="critical" {% if request.GET.severity == 'critical' %}selected{% endif %}>Критическая</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-1"></i>Фильтр</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if reports %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Дата</th>
+                <th>Участок</th>
+                <th>Оборудование</th>
+                <th>Проблема</th>
+                <th>Критичность</th>
+                <th>Статус</th>
+                <th>Автор</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.created_at|date:"d.m.Y" }}</td>
+                <td>{{ report.equipment.section.name }}</td>
+                <td><a href="{% url 'report_detail' report.id %}">{{ report.equipment.name }}</a></td>
+                <td>{{ report.problem_type.name }}</td>
+                <td><span class="badge badge-{{ report.severity }}">{{ report.get_severity_display }}</span></td>
+                <td><span class="badge bg-{{ report.status|default:'secondary' }}">{{ report.get_status_display }}</span></td>
+                <td>{{ report.created_by.username }}</td>
+                <td><a href="{% url 'report_detail' report.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card text-center p-5">
+    <i class="fas fa-inbox text-muted fa-4x mb-3"></i>
+    <h5>Нет отчётов</h5>
+</div>
+{% endif %}
+
+<a href="{% url 'home' %}" class="btn btn-outline-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>На главную</a>
+
+{% endblock %}
